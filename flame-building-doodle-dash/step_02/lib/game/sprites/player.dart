@@ -48,24 +48,31 @@ class Player extends SpriteGroupComponent<PlayerState>
 
     // Core gameplay: Add circle hitbox to Dash
 
-    // Add a Player to the game: loadCharacterSprites
-    // Add a Player to the game: Default Dash onLoad to center state
+    await _loadCharacterSprites();
+    current = PlayerState.center;
   }
 
   @override
   void update(double dt) {
     // Add a Player to the game: Add game state check
-
+    // ensure that the game isn't in a non-playable state where the player shouldn't move, like during the initial state (when the game first loads) or the game over state.
+    if (gameRef.gameManager.isIntro || gameRef.gameManager.isGameOver) return;
     // Add a Player to the game: Add calcualtion for Dash's horizontal velocity
+
+    _velocity.x = _hAxisInput * jumpSpeed;
 
     final double dashHorizontalCenter = size.x / 2;
 
     // Add a Player to the game: Add infinite side boundaries logic
-
+    if (position.x < dashHorizontalCenter) {
+      position.x = gameRef.size.x - (dashHorizontalCenter);
+    }
     // Core gameplay: Add gravity
 
     // Add a Player to the game: Calculate Dash's current position based on
     // her velocity over elapsed time since last update cycle
+    // If the game is in a playable state, Dash's position is calculated
+    position += _velocity * dt;
     super.update(dt);
   }
 
@@ -74,20 +81,32 @@ class Player extends SpriteGroupComponent<PlayerState>
     _hAxisInput = 0;
 
     // Add a Player to the game: Add keypress logic
+    if (keysPressed.contains(LogicalKeyboardKey.arrowLeft)) {
+      moveLeft();
+    }
+    if (keysPressed.contains(LogicalKeyboardKey.arrowRight)) {
+      moveRight();
+    }
 
+    if (keysPressed.contains(LogicalKeyboardKey.arrowUp)) {
+      // jump();
+    }
     return true;
   }
 
   void moveLeft() {
     _hAxisInput = 0;
-
     // Add a Player to the game: Add logic for moving left
+    current = PlayerState.left;
+    _hAxisInput += movingLeftInput;
   }
 
   void moveRight() {
     _hAxisInput = 0;
 
     // Add a Player to the game: Add logic for moving right
+    current = PlayerState.right;
+    _hAxisInput += movingRightInput;
   }
 
   void resetDirection() {
